@@ -1,4 +1,4 @@
-# Simga Skibidi Shooter V0.3
+# Simga Skibidi Shooter V1
 game for fun (And a joke)
 
 # CONTROLS 
