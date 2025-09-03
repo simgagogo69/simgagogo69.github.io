@@ -3344,7 +3344,7 @@ function updateMinions() {
         minion.y < minion.target.y + minion.target.h &&
         minion.y + minion.h > minion.target.y
       ) {
-        const exchangeDmg = 10;
+        let exchangeDmg = 10;
           exchangeDmg = 10 * magicMulti
         minion.hp -= exchangeDmg;
 takeEnemyDamage(minion.target, exchangeDmg);
