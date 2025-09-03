@@ -73,6 +73,10 @@ let epochTimeStopTimer = 60;
 let moduloFlashTimer = 0;
 let moduloFlashNum = 0;
 let enemyCounter = 1;
+let gold = 0;
+let weaponLevels = {};
+let selectedPauseWeapon = null;
+let weaponDamageMultipliers = {};
 let player = {
   x: 300,
   y: 300,
@@ -311,14 +315,21 @@ const enemyTypes = {
       };
 
 function applyStats() {
-  player.damage = (baseDamage + statUpgrades.damage * 2) * (skillBonuses.damage + 1);
-    console.log(`Damage: base(${baseDamage}) + upgrades(${statUpgrades.damage}) x skills(${skillBonuses.damage})`);
-fireRateMultiplier = Math.max(0.05, 1.0 - (statUpgrades.reload * 0.02 + skillBonuses.fireRate));
+    console.log("stats applied")
+  if (currentWeapon && weaponLevels[currentWeapon] > 5)
+    weaponLevels[currentWeapon] = 5;
+
+  let level = weaponLevels[currentWeapon] || 1;
+  let multi = getWeaponDamageMultiplier(level);
+  player.damage = (baseDamage + statUpgrades.damage * 2) * (skillBonuses.damage + 1) * multi;
+
+  fireRateMultiplier = Math.max(0.05, 1.0 - (statUpgrades.reload * 0.02 + skillBonuses.fireRate));
   maxHP = (baseHP + statUpgrades.maxHP * 10) * (skillBonuses.maxHP + 1);
-    console.log(`HP: base(${baseHP}) + upgrades(${statUpgrades.maxHP}) x skills(${skillBonuses.maxHP})`);
-    magicMulti = 1 + (statUpgrades.intellect * 0.1) * (1 + skillBonuses.intellect);
-    player.speed = 40 + (statUpgrades.speed * 2)
+  magicMulti = 1 + (statUpgrades.intellect * 0.1) * (1 + skillBonuses.intellect);
+  player.speed = 40 + (statUpgrades.speed * 2);
+
   updateHUD();
+    console.log(`${player.damage}`)
 }
 
       function createParticle(x, y, color) {
@@ -351,8 +362,10 @@ function handleEnemyDeath(enemy, enemiesArr, index) {
   createParticle(enemy.x + enemy.w / 2, enemy.y + enemy.h / 2, enemy.boss ? 'purple' : 'red');
 if (enemy.boss) {
   score += bossScoreReward(enemy.name);
+  gold += wave * 10  
 } else {
   score += 10;
+  gold += 1 + wave  
 }
   itemDrop(enemy.x + enemy.w / 2, enemy.y + enemy.h / 2);
   if (unlockedSkills.includes("Life Steal")) hp = Math.min(maxHP, hp + 2);
@@ -869,10 +882,62 @@ function updateBossHUD(boss) {
   hpText.textContent = `${Math.floor(hp)} / ${Math.floor(max)}`;
 }
 
-
-
+function saveGame() {
+  const saveData = {
+    wave,
+    upgradePoints,
+    skillPoints,
+    unlockedSkills,
+    inventory,
+    currentWeapon,
+    boundSkills,
+    statUpgrades,
+    hp,
+    level,
+    score,
+    gold,
+    weaponLevels,
+    
+  };
+  localStorage.setItem("simgaShooterSave", JSON.stringify(saveData));
+}
 
 function loadGame() {
+  const data = localStorage.getItem("simgaShooterSave");
+  if (data) {
+    try {
+      const save = JSON.parse(data);
+
+      wave = save.wave ?? 1;
+      upgradePoints = save.upgradePoints ?? 0;
+      skillPoints = save.skillPoints ?? 0;
+      unlockedSkills = save.unlockedSkills ?? [];
+      inventory = save.inventory ?? ['pistol'];
+      currentWeapon = save.currentWeapon ?? 'pistol';
+      hp = save.hp ?? 0
+      level = save.level ?? 1
+      score = save.score ?? 0  
+        
+      if (save.boundSkills) {
+        boundSkills.Q = save.boundSkills.Q ?? null;
+        boundSkills.E = save.boundSkills.E ?? null;
+      }
+        
+      if (save.statUpgrades) {  
+        statUpgrades = save.statUpgrades;
+      }
+    weaponLevels = save.weaponLevels || {};
+      drawInventory();
+      applyStats();
+      updateHUD();
+      spawnEnemy();
+
+      return;
+    } catch (e) {
+      console.error("Failed to load save:", e);
+    }
+  }
+
   if (!inventory.includes('pistol')) {
     inventory.push('pistol');
     currentWeapon = 'pistol';
@@ -880,22 +945,125 @@ function loadGame() {
   }
 }
 
-      
-    const weaponsData = {
-      pistol: { name: "Pistol", fireRate: 20, type: "single" },
-      shotgun: { name: "Shotgun", fireRate: 40, type: "spread" },
-      burst: { name: "Burst", fireRate: 30, type: "burst3" },
-      auto: { name: "Auto", fireRate: 12, type: "auto" },
-      laser: { name: "Laser", fireRate: 100, type: "laser" },
-      missile: { name: "Missile", fireRate: 60, type: "missile" },
-      boomerang: { name: "Boomerang", fireRate: 60, type: "boomerang" },
-      plasma: { name: "Plasma", fireRate: 80, type: "plasma" },
-      minigun: { name: "Minigun", fireRate: 20, type: "minigun" },
-      sword: { name: "Sword", fireRate: 30, type: "melee"},
-      spear: { name: "Spear", fireRate: 38, type: "melee"},
-      katana: { name: "Katana", fireRate: 28, type: "melee" }    
-    };
-      
+function loadGameTest() {
+      if (!inventory.includes('pistol')) {
+    inventory.push('pistol');
+    currentWeapon = 'pistol';
+    drawInventory();
+  }
+    }
+function resetSave() {
+  localStorage.removeItem("simgaShooterSave");
+  location.reload();
+}  
+
+const rarityTiers = [
+  { label: "Common",    color: "#bfbfbf", min: 0.04 },   // 4%+
+  { label: "Uncommon",  color: "#4cff4c", min: 0.01 },   // 1% - 4%
+  { label: "Rare",      color: "#4ccfff", min: 0.003 },  // 0.3% - 1%
+  { label: "Epic",      color: "#cf6cff", min: 0.001 },  // 0.1% - 0.3%
+  { label: "Legendary", color: "#ffd700", min: 0 }       // below 0.1%
+];
+function getRarity(dropChance) {
+  for (const tier of rarityTiers) {
+    if (dropChance >= tier.min) return tier;
+  }
+  return rarityTiers[rarityTiers.length - 1];
+}
+
+const weaponsData = {
+  pistol: {
+    name: "Pistol",
+    fireRate: 20,
+    type: "single",
+    special: "None",
+    rarity: "Common"
+  },
+  shotgun: {
+    name: "Shotgun",
+    fireRate: 40,
+    type: "spread",
+    special: "Shoots 5 pellets instead of 3",
+    rarity: "Uncommon"
+  },
+  burst: {
+    name: "Burst",
+    fireRate: 30,
+    type: "burst3",
+    special: "Fires 5-burst instead of 3",
+    rarity: "Uncommon"
+  },  
+    auto: {
+    name: "Auto",
+    fireRate: 12,
+    type: "auto",
+    special: "Fire rate greatly increased",
+    rarity: "Uncommon"
+  },
+  laser: {
+    name: "Laser",
+    fireRate: 100,
+    type: "laser",
+    special: "Double laser width",
+    rarity: "Legendary"
+  },
+  missile: {
+    name: "Missile",
+    fireRate: 60,
+    type: "missile",
+    special: "Explodes in a larger radius",
+    rarity: "Rare"
+  },
+  boomerang: {
+    name: "Boomerang",
+    fireRate: 60,
+    type: "boomerang",
+    special: "Returns twice, not just once",
+    rarity: "Legendary"
+  },
+  plasma: {
+    name: "Plasma",
+    fireRate: 80,
+    type: "plasma",
+    special: "Larger AoE and slows enemies",
+    rarity: "Epic"
+  },
+  minigun: {
+    name: "Minigun",
+    fireRate: 20,
+    type: "minigun",
+    special: "Ramp up speed is doubled",
+    rarity: "Epic"
+  },
+  sword: {
+    name: "Sword",
+    fireRate: 30,
+    type: "melee",
+    special: "Double arc size",
+    rarity: "Rare"
+  },
+  spear: {
+    name: "Spear",
+    fireRate: 38,
+    type: "melee",
+    special: "Double range",
+    rarity: "Rare"
+  },
+  katana: {
+    name: "Katana",
+    fireRate: 28,
+    type: "melee",
+    special: "Charges and dashes twice as fast",
+    rarity: "Legendary"
+  }
+};
+    function getWeaponDamageMultiplier(level) {
+  if (level >= 5) return 3.0;
+  if (level === 4) return 2.0;
+  if (level === 3) return 1.5;
+  if (level === 2) return 1.25;
+  return 1.0;
+}
     let inventory = [], currentWeapon = null;
     let showInventory = false, menuVisible = false;
 
@@ -919,6 +1087,7 @@ function loadGame() {
           minigunCurrentFireRate = weaponsData.minigun.fireRate;
         }
         currentWeapon = w;
+        applyStats();
         drawInventory();
       };
       rowDiv.appendChild(div);
@@ -1918,8 +2087,7 @@ for (let i = droppedItems.length - 1; i >= 0; i--) {
       createParticle(item.x, item.y, 'cyan');
       updateHUD();
     } else {
-      inventory.push(item.item);
-      currentWeapon = item.item;
+      addWeaponToInventory(item.item);
       drawInventory();
       if (currentWeapon === 'minigun') {
         minigunHoldTimer = 0;
@@ -2722,6 +2890,7 @@ createParticle(player.x, player.y, "green")
 createParticle(player.x, player.y, "gold")
   return;
 }
+        saveGame();
         pause = true;
         document.getElementById("deathScreen").style.display = "flex";
         minions.length = 0;
@@ -2729,6 +2898,16 @@ createParticle(player.x, player.y, "gold")
           skillCooldowns[key] = 0;
         }
       }
+}
+
+function addWeaponToInventory(weaponName) {
+  if (!inventory.includes(weaponName)) {
+    inventory.push(weaponName);
+    weaponLevels[weaponName] = weaponLevels[weaponName] || 1;
+    currentWeapon = weaponName;
+    applyStats();
+    drawInventory();
+  }
 }
 
 function updateSkillProjectiles() {
@@ -4079,6 +4258,8 @@ if (katanaDashing && katanaDashTimerStart) {
 
 if (enemies.length === 0 && waveTimer <= 0) {
   wave++;
+  saveGame();
+
   if (wave > 100) {
     pause = true;
     document.getElementById("winScreen").style.display = "flex";
@@ -4148,9 +4329,8 @@ for (const enemy of enemies) {
   animationFrameId = requestAnimationFrame(gameLoop);
 }
 
-
-    updateHUD();
     loadGame();
+    updateHUD();
     updateUpgradeButtons();
 
 window.onload = () => {
@@ -4280,12 +4460,19 @@ function showTab(tab) {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
   document.querySelectorAll('.tab-content').forEach(tabEl => {
-    tabEl.style.display = tabEl.id === 'tab-' + tab ? 'block' : 'none';
+    if (tabEl.id === 'tab-' + tab) {
+      if(tabEl.id === 'tab-inventory') {
+        tabEl.style.display = 'flex';
+      } else {
+        tabEl.style.display = 'block';
+      }
+    } else {
+      tabEl.style.display = 'none';
+    }
   });
-  if(tab === 'skills') renderSkillTree();
-    if(tab === 'upgrades') {
-        document.getElementById('upgradeMenu').style.display = 'flex'
-        }
+  if (tab === 'skills') renderSkillTree();
+  if (tab === 'upgrades') document.getElementById('upgradeMenu').style.display = 'flex';
+  if (tab === 'inventory') drawPauseWeaponList();
 }
 
 function startMedicine() {
@@ -4947,6 +5134,106 @@ function drawBerserkerStatus() {
   ctx.fillText(text, 24, canvas.height - 24);
   ctx.restore();
 }
+function drawPauseWeaponList() {
+  const list = document.getElementById("pauseWeaponList");
+  list.innerHTML = "";
+  inventory.forEach((w, idx) => {
+    const div = document.createElement("div");
+    div.className = "weapon-block" + (w === selectedPauseWeapon ? " selected" : "");
+    div.draggable = true;
+    div.textContent = `${weaponsData[w]?.name || w}\nLv.${weaponLevels[w] || 1}`;
+    div.onclick = () => {
+      selectedPauseWeapon = w;
+      drawPauseWeaponList();
+      drawPauseUpgradeMenu();
+    };
+
+    // Drag & drop handlers
+    div.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", idx);
+      div.classList.add("selected");
+    });
+    div.addEventListener("dragend", e => {
+      div.classList.remove("selected");
+      drawPauseWeaponList();
+    });
+    div.addEventListener("dragover", e => {
+      e.preventDefault();
+      div.classList.add("drag-over");
+    });
+    div.addEventListener("dragleave", e => div.classList.remove("drag-over"));
+    div.addEventListener("drop", e => {
+      e.preventDefault();
+      const fromIdx = Number(e.dataTransfer.getData("text/plain"));
+      const toIdx = idx;
+      div.classList.remove("drag-over");
+      if (fromIdx !== toIdx) {
+        const item = inventory[fromIdx];
+        inventory.splice(fromIdx, 1);
+        inventory.splice(toIdx, 0, item);
+        selectedPauseWeapon = item;
+        drawPauseWeaponList();
+        drawPauseUpgradeMenu();
+        saveGame(); // Save new order!
+      }
+    });
+
+    list.appendChild(div);
+  });
+  drawPauseUpgradeMenu();
+}
+
+function drawPauseUpgradeMenu() {
+  const menu = document.getElementById("pauseUpgradeMenu");
+  if (!selectedPauseWeapon) {
+    menu.innerHTML = "<div style='color:#555;'>Select a weapon to upgrade.</div>";
+    return;
+  }
+  const w = selectedPauseWeapon;
+  const level = weaponLevels[w] || 1;
+  const multi = getWeaponDamageMultiplier(level);
+  const nextMulti = getWeaponDamageMultiplier(Math.min(level + 1, 5));
+  const weapon = weaponsData[w];
+  const rarity = weapon.rarity
+
+menu.innerHTML = `
+  <div>
+    <h4>Upgrade: ${weapon.name}</h4>
+    <div>Level: ${level} / 5</div>
+    <div>Type: <b>${weapon.type.charAt(0).toUpperCase() + weapon.type.slice(1)}</b></div>
+    <div>Fire Rate: <b>${weapon.fireRate}</b></div>
+    <div>Rarity: <b>${weapon.rarity}</b></div>
+    <div>Gold: <span style="color:gold">${gold}</span></div>
+    <button onclick="upgradeWeapon('${w}')"
+      ${level >= 5 || gold < getWeaponUpgradeCost(w) ? "disabled" : ""}>
+      Upgrade (${getWeaponUpgradeCost(w)} Gold)
+    </button>
+    <div style="margin-top:14px;">
+      <div>Damage Multiplier: <b>x${multi.toFixed(2)}</b>${level < 5 ? ` → <b>x${nextMulti.toFixed(2)}</b> (next)` : ""}</div>
+    </div>
+  </div>
+`;
+}
+
+function getWeaponUpgradeCost(weapon) {
+  const level = weaponLevels[weapon] || 1;
+  return level * (50 * level);
+}
+
+function upgradeWeapon(weapon) {
+  const level = weaponLevels[weapon] || 1;
+  if (level >= 5) return;
+  const cost = getWeaponUpgradeCost(weapon);
+  if (gold >= cost) {
+    gold -= cost;
+    weaponLevels[weapon] = level + 1;
+    drawPauseUpgradeMenu();
+    drawPauseWeaponList();
+    applyStats();
+    updateHUD();
+    saveGame();
+  }
+}
 
 function restartGame() {
   if (animationFrameId) {
@@ -5010,14 +5297,14 @@ berserkerActive = false;
 berserkerTimer = 0;
 
     
-    applyStats();
+
     checkOverchargeTrigger();
     updatePlayer();
     hp = maxHP;
 
   inventory = ['pistol'];
   currentWeapon = 'pistol';
-
+    applyStats();
   bullets = [];
   enemyBullets = [];
   enemies = [];

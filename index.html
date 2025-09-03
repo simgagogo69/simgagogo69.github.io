@@ -38,6 +38,7 @@ canvas {
 
 
 #hud {
+  pointer-events: none;  
   position: absolute;
   top: 10px;
   left: 10px;
@@ -54,7 +55,8 @@ canvas {
 }
     #hud span { 
 font-weight: bold; 
-color: var(--accent); }
+color: var(--accent); 
+    }
       
     #upgradeMenu {
         width: 600;
@@ -646,10 +648,8 @@ opacity: 0;
 
 .tab-content {
   display: none;
-}
-
-.tab-content.active {
-  display: block;
+  flex-direction: column;
+  align-items: center;
 }
       #pauseMenu button#closePauseMenu {
   position: absolute;
@@ -690,10 +690,101 @@ opacity: 0;
 #playerBarText {
     position:absolute;width:100%;height:100%;line-height:24px;text-align:center;color:#fff;font-weight:bold;z-index:3;text-shadow:0 1px 2px #000,0 0 4px #222;
     }
-#notice {
-  position: absolute;
-  top: 200px;
-  left: 200px;
+      
+#tab-inventory {
+  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: 40px;
+}
+
+#pauseInventoryContainer {
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+  max-width: 420px;
+  background: none;
+  box-shadow: none;
+  border: none;
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.weapon-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#pauseUpgradeMenu button {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  padding: 14px 40px;
+  margin: 12px 0;
+  background: #111;
+  color: cyan;
+  border: 2px solid cyan;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 12px cyan;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.2s;
+  width: 280px;
+  text-align: center;
+  z-index: 6000;
+  display: block;
+}
+
+#pauseUpgradeMenu button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#pauseUpgradeMenu button:hover:enabled {
+  transform: scale(1.06);
+  box-shadow: 0 0 20px cyan, 0 0 40px magenta;
+  background: #222;
+}
+
+
+.weapon-block:hover {
+  background: #222;
+  box-shadow: 0 0 16px cyan, 0 0 24px magenta;
+  border-color: #fff;
+  color: #fff;
+  transform: scale(1.05);
+  z-index: 2;
+}
+      
+.weapon-block {
+  border: 2px solid cyan;
+  border-radius: 8px;
+  background: #111;
+  color: cyan;
+  padding: 10px 16px;
+  font-size: 16px;
+  cursor: grab;
+  min-width: 90px;
+  text-align: center;
+  transition: box-shadow 0.2s, background 0.2s, border-color 0.2s;
+  user-select: none;
+}
+.weapon-block.selected {
+  border-color: gold;
+  box-shadow: 0 0 12px gold;
+  color: gold;
+}
+.weapon-block.drag-over {
+  border-color: magenta;
+  box-shadow: 0 0 12px magenta;
+}
+
   </style>
 </head>
     <div id="abilityHUD">
@@ -714,7 +805,7 @@ opacity: 0;
 <body>
     
 <div id="startScreen">
-  <h1>SIMGA SKIBIDI SHOOTER V1.0</h1>
+  <h1>SIMGA SKIBIDI SHOOTER V1.1</h1>
   <button id="startBtn">Start</button>
   <button id="howBtn">How to Play</button>
     <button id="socialBtn">Credits</button>
@@ -780,7 +871,7 @@ opacity: 0;
     <div id="pauseMenuTabs">
       <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
       <button class="tab-btn" data-tab="skills">Skill Tree</button>
-      <button class="tab-btn" data-tab="notice">Inventory</button>
+      <button class="tab-btn" data-tab="inventory">Inventory</button>
       <button id="closePauseMenu" style="float:right;">❌</button>
     </div>
     <div class="tab-content" id="tab-upgrades" style="display:none;">
@@ -813,14 +904,14 @@ opacity: 0;
 </div>
     </div>
 </div>
-        
-    </div>
-    <div class="tab-content" id="tab-notice" style="display:none;">
-  <div id="notice">
-    <p>Configurable Inventory + Weapon Upgrades Coming Soon, Press <b>F</b> to view inventory outside of this window</p>
+        <div class="tab-content" id="tab-inventory" style="display:none;">
+  <div id="pauseInventoryContainer">
+    <div id="pauseWeaponList" class="weapon-list"></div>
+    <div id="pauseUpgradeMenu"></div>
   </div>
+</div>
+</div>
     </div>
-  </div>
 
     
 <div id="bossHUD" style="display:none;" class="panel">
