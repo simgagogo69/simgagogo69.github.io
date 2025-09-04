@@ -565,8 +565,8 @@ function spawnBoss(type, extraProps = {}) {
   else if (type === "Blob King") {
     boss = createEnemy("Blob King", {
       id: enemyCounter++,  
-      maxhp: 25000,
-      hp: 25000,
+      maxhp: 50000,
+      hp: 50000,
       speed: 0.2,
       w: 60,
       h: 60,
@@ -580,8 +580,8 @@ function spawnBoss(type, extraProps = {}) {
   else if (type === "Terrashock") {
     boss = createEnemy("Terrashock", {
       id: enemyCounter++,  
-      maxhp: 50000,
-      hp: 50000,
+      maxhp: 150000,
+      hp: 150000,
       speed: 0.6,
       w: 70,
       h: 70,
@@ -595,8 +595,8 @@ function spawnBoss(type, extraProps = {}) {
   else if (type === "GUNGEAR") {
     boss = createEnemy("GUNGEAR", {
       id: enemyCounter++,  
-      maxhp: 100000,
-      hp: 100000,
+      maxhp: 500000,
+      hp: 500000,
       speed: 0.9,
       w: 70,
       h: 70,
@@ -610,8 +610,8 @@ function spawnBoss(type, extraProps = {}) {
   else if (type === "Masquerade") {
     boss = createEnemy("Masquerade", {
       id: enemyCounter++,  
-      maxhp: 500000,
-      hp: 500000,
+      maxhp: 1000000,
+      hp: 1000000,
       speed: 1.5,
       w: 50,
       h: 50,
@@ -625,8 +625,8 @@ function spawnBoss(type, extraProps = {}) {
    else if (type === "Necron") {
   boss = createEnemy("Necron", {
     id: enemyCounter++,  
-    maxhp: 850000,
-    hp: 850000,
+    maxhp: 3000000,
+    hp: 3000000,
     speed: 0.1,
     w: 80,
     h: 80,
@@ -640,8 +640,8 @@ function spawnBoss(type, extraProps = {}) {
   else if (type === "Blinkblade") {
   boss = createEnemy("Blinkblade", {
     id: enemyCounter++,  
-    maxhp: 1200000,
-    hp: 1200000,
+    maxhp: 5000000,
+    hp: 5000000,
     speed: 0.9,
     w: 60,
     h: 60,
@@ -666,8 +666,8 @@ function spawnBoss(type, extraProps = {}) {
 else if (type === "Crucible") {
   boss = createEnemy("Crucible", {
     id: enemyCounter++,  
-    maxhp: 2000000,
-    hp: 2000000,
+    maxhp: 7000000,
+    hp: 7000000,
     speed: 0.15,
     w: 120,
     h: 120,
@@ -694,9 +694,9 @@ else if (type === "Crucible") {
     else if (type === "Unix Epoch") {
   boss = createEnemy("Unix Epoch", {
     id: enemyCounter++,  
-    maxhp: 5000000,
-    hp: 5000000,
-    speed: 0.3,
+    maxhp: 25000000,
+    hp: 25000000,
+    speed: 0.6,
     w: 120,
     h: 120,
     boss: true,
@@ -2760,7 +2760,7 @@ function fireUnixBinaryShot(boss, player, customAngle) {
   const type = Math.random() < 0.5 ? 0 : 1;
   fireEnemyBullet(
     boss.x + boss.w / 2, boss.y + boss.h / 2,
-    angle, 7, 16, type === 0 ? "#00ffff" : "#ff00ff", 30,
+    angle, 7, 16, type === 0 ? "#00ffff" : "#ff00ff", 100,
     { unixBinary: type }
   );
 }
@@ -2775,7 +2775,7 @@ function fireUnixModuloShot(boss, player, count) {
 
 function fireUnixBinaryExplosion(x, y) {
   for (let b = 0; b < 12; b++) {
-    fireEnemyBullet(x, y, b * Math.PI / 6, 6, 14, "#00ff99", 25, {
+    fireEnemyBullet(x, y, b * Math.PI / 6, 6, 14, "#00ff99", 80, {
       unixBinary: Math.random() < 0.5 ? 0 : 1
     });
   }
