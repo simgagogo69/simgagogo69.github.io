@@ -1373,14 +1373,12 @@ function linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
     });
   } 
 
-  enemies.forEach((enemy, i) => {
-    const dx = (enemy.x + enemy.w / 2) - x;
-    const dy = (enemy.y + enemy.h / 2) - y;
+    const dx = (player.x + player.w / 2) - x;
+    const dy = (player.y + player.h / 2) - y;
     const dist = Math.hypot(dx, dy);
-    if (dist < 100 && enemy.type !== "boomling") {
-      enemy.hp -= 5;
+    if (dist < 100) {
+      player.hp -= 20 + wave;
     }
-  });
 }
 
       
