@@ -4672,6 +4672,8 @@ function openPauseMenu() {
   pause = true;
   document.getElementById('pauseMenu').style.display = 'flex';
   showTab('upgrades');
+  updateHUD();
+  updateUpgradeButtons();
 }
 function closePauseMenu() {
   pause = false;
