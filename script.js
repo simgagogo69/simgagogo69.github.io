@@ -5573,7 +5573,7 @@ function loadGame() {
       applyStats();
       updateHUD();
       spawnEnemy();
-
+      updateUpgradeButtons();  
       return;
     } catch (e) {
       console.error("Failed to load save:", e);
