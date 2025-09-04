@@ -162,7 +162,7 @@ const skins = [
     let enemyBullets = [];
     let baseHP = 100;
     let baseDamage = 5
-    let hp = 100, maxHP = 100, score = 0, level = 1, wave = 0, upgradePoints = 0, skillPoints = 100;
+    let hp = 100, maxHP = 100, score = 0, level = 1, wave = 0, upgradePoints = 0, skillPoints = 0;
     let nextLevelScore = 500;
     let nextUpgradeScore = 100;
     let upgradePointsObtained = 0;
