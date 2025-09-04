@@ -5027,6 +5027,7 @@ function resetSkillPoints() {
   reapplyPassiveSkillEffects();
   updateHUD();
   renderSkillTree();
+  applyStats();
 }
 function reapplyPassiveSkillEffects() {
   skillBonuses = { damage: 0, fireRate: 0, maxHP: 0, intellect: 0 };
