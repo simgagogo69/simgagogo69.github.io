@@ -3757,7 +3757,7 @@ bullet.rotation += 0.35;
 }
       }
     }
-
+}
     canvas.addEventListener('mouseup', e => {
   mouseDown = false;
   if (currentWeapon === 'minigun') {
@@ -3765,7 +3765,7 @@ bullet.rotation += 0.35;
     minigunCurrentFireRate = weaponsData.minigun.fireRate;
   }
 });
-    }
+  
 function explodeMissile(x, y, bulletIndex) {
   const radius = 200;
   const explosionDamage = 10 + player.damage * 2;
