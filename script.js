@@ -239,7 +239,7 @@ const dropChances = {
   auto: 0.01,        
   laser: 0.0005,     
   missile: 0.0025,   
-  boomerang: 0.5,
+  boomerang: 0.0005,
   plasma: 0.00125,  
   minigun: 0.0025,
   sword: 0.00375,  
