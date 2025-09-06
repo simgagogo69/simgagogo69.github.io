@@ -5627,7 +5627,7 @@ function restartGame() {
 if (unlockedSkills.includes("Second Wind") && secondWind === false) {
     secondWind = true
     }
-if (unlockedSkills.includes("Shield Generator") {
+if (unlockedSkills.includes("Shield Generator")) {
     player.shield = 250;
 player.maxShield = 250;
 player.shieldRegenTimer = 0;
