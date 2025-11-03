@@ -991,6 +991,62 @@ opacity: 0;
 
   width: 100%;
 }
+
+    .start-dropdown {
+  position: absolute;
+  top: 32px;
+  right: 48px;
+  z-index: 20000;
+}
+
+.start-dropbtn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 20px;
+  padding: 10px 28px;
+  background: #111;
+  color: cyan;
+  border: 2px solid cyan;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 12px cyan;
+  transition: background 0.2s, box-shadow 0.3s;
+}
+
+.start-dropdown-content {
+  display: none;
+  position: absolute;
+  background: #111;
+  min-width: 180px;
+  border: 2px solid cyan;
+  border-radius: 12px;
+  box-shadow: 0 0 10px cyan;
+  right: 0;
+  top: 115%;
+  z-index: 20001;
+}
+
+.start-dropdown-content a {
+  color: cyan;
+  padding: 14px 18px;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #222;
+  transition: background 0.2s, color 0.2s;
+  font-size: 18px;
+}
+.start-dropdown-content a:last-child {
+  border-bottom: none;
+}
+.start-dropdown-content a:hover {
+  background: #222; 
+  color: #fff;
+}
+
+.start-dropdown:hover .start-dropdown-content,
+.start-dropdown:focus-within .start-dropdown-content {
+  display: block;
+}
+    
   </style>
 </head>
     <div id="abilityHUD">
@@ -1045,7 +1101,15 @@ opacity: 0;
   </div>
 </div>
 
-
+  <div class="start-dropdown">
+    <button class="start-dropbtn">Links ▼</button>
+    <div class="start-dropdown-content">
+      <a href="https://discord.gg/TAx4NSZY7c" target="_blank">Discord</a>
+      <a href="https://github.com/" target="_blank">GitHub</a>
+      <a href="https://twitter.com/" target="_blank">Twitter</a>
+    </div>
+  </div>
+</div>
     
 <div id="deathScreen" style="display: none;">
   <div id="deathContent">
