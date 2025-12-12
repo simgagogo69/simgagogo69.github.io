@@ -4382,12 +4382,14 @@ window.onload = () => {
     document.getElementById("startScreen").style.display = "none";
     gameLoop();
       document.getElementById("abilityHUD").style.display = "flex";
+      document.getElementByID("start-dropdown").style.display = "none";
         }
         if (fromEsc === true) {
     pause = false;
     document.getElementById("startScreen").style.display = "none";
       document.getElementById("abilityHUD").style.display = "flex";
     fromEsc = false
+      document.getElementByID("start-dropdown").style.display = "none";
         }
   });
 
@@ -4418,6 +4420,7 @@ document.getElementById("resetSaveBtn").onclick = resetSave;
     document.getElementById("abilityHUD").style.display = "none";
     document.getElementById("pauseMenu").style.display = "none";
     document.getElementById("hud").style.display = "block";
+    document.getElementByID("start-dropdown").style.display = "flex";
   };
 document.getElementById("resetSkillPointsBtn").onclick = function() {
     resetSkillPoints();
