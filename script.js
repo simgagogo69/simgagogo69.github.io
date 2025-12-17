@@ -4420,7 +4420,7 @@ document.getElementById("resetSaveBtn").onclick = resetSave;
     document.getElementById("abilityHUD").style.display = "none";
     document.getElementById("pauseMenu").style.display = "none";
     document.getElementById("hud").style.display = "block";
-    document.getElementByID("start-dropdown").style.display = "flex";
+    document.getElementById("start-dropdown").style.display = "flex";
   };
 document.getElementById("resetSkillPointsBtn").onclick = function() {
     resetSkillPoints();
