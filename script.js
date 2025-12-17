@@ -4382,14 +4382,14 @@ window.onload = () => {
     document.getElementById("startScreen").style.display = "none";
     gameLoop();
       document.getElementById("abilityHUD").style.display = "flex";
-      document.getElementByID("start-dropdown").style.display = "none";
+      document.getElementById("start-dropdown").style.display = "none";
         }
         if (fromEsc === true) {
     pause = false;
     document.getElementById("startScreen").style.display = "none";
       document.getElementById("abilityHUD").style.display = "flex";
     fromEsc = false
-      document.getElementByID("start-dropdown").style.display = "none";
+      document.getElementById("start-dropdown").style.display = "none";
         }
   });
 
