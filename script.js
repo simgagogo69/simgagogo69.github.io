@@ -5712,6 +5712,11 @@ berserkerTimer = 0;
   drawInventory();
     applyStats();
         hp = maxHP;
+  if (unlockedSkills.includes("Shield Generator")) {
+    player.shield = 250;
+player.maxShield = 250;
+player.shieldRegenTimer = 0;
+    }
   gameLoop(); 
     updateUpgradeButtons();
 }
